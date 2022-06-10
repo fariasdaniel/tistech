@@ -1,0 +1,610 @@
+openapi: 3.0.0
+info:
+  title: Swagger Schedule - OpenAPI 3.0
+  description: Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/) or HTML.
+  version: 1.0
+
+servers:
+  - url: http://api.tistech.co.ao
+    description: Optional server description, e.g. Main (production) server
+
+components:
+  schemas:
+    ExamRequestPost:
+      required:
+        - name
+        - room
+        - candidate
+        - availability
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'Java'
+        room:
+          type: object
+          $ref: '#/components/schemas/RoomPost'
+        availability:
+          type: object
+          $ref: '#/components/schemas/AvailabilityResponse'
+        candidate:
+          type: object
+          $ref: '#/components/schemas/CandidateResponse'
+
+    ExamRequestPut:
+      required:
+        - id
+        - name
+        - room
+        - candidate
+        - availability
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+        name:
+          type: string
+          example: 'Java'
+        room:
+          type: object
+          $ref: '#/components/schemas/RoomPost'
+        availability:
+          type: object
+          $ref: '#/components/schemas/AvailabilityResponse'
+        candidate:
+          type: object
+          $ref: '#/components/schemas/CandidateResponse'
+
+    ExamResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+        name:
+          type: string
+          example: 'Java'
+        room:
+          type: object
+          $ref: '#/components/schemas/RoomPost'
+        availability:
+          type: object
+          $ref: '#/components/schemas/AvailabilityResponse'
+        candidate:
+          type: object
+          $ref: '#/components/schemas/CandidateResponse'
+
+    Candidate:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'Daniel Farias Silva'
+
+    CandidateResponse:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 1
+        name:
+          type: string
+          example: 'Daniel Farias Silva'
+
+    Availability:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'Desk 1'
+
+
+    AvailabilityResponse:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 1
+        name:
+          type: string
+          example: 'Desk 1'
+
+    Room:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'Room 1'
+
+    RoomPost:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 10
+        name:
+          type: string
+          example: 'Room 1'
+
+    RoomResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 10
+        name:
+          type: string
+          example: 'Room 1'
+        availabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Availability'
+
+
+paths:
+  /exam:
+    post:
+      tags:
+        - Exam
+      summary: Add a new exam
+      description: Add a new exam
+      operationId: post
+      requestBody:
+        description: Create a new exam
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamRequestPost'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamResponse'
+        '405':
+          description: Invalid input
+    get:
+      tags:
+        - Exam
+      summary: Get All exams
+      description: List all exams
+      operationId: get
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExamResponse'
+
+    put:
+      tags:
+        - Exam
+      summary: Update an existing exam
+      description: Update an existing exam by Id
+      operationId: update
+      requestBody:
+        description: Update an existent exam
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamRequestPut'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamResponse'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Exam not found
+        '405':
+          description: Validation exception
+
+  /exam/{id}:
+    get:
+      tags:
+        - Exam
+      summary: Find exam by id
+      description: 'Return an exam'
+      operationId: findExamById
+      parameters:
+        - name: id
+          in: path
+          description: Filter by ID
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExamResponse'
+        '400':
+          description: Invalid id value
+
+    delete:
+      tags:
+        - Exam
+      summary: Delete an exam
+      description: 'Delete'
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          description: Exam id to delete
+          required: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        '400':
+          description: Invalid Id value
+
+  /candidate:
+    post:
+      tags:
+        - Candidate
+      summary: Add a new candidate
+      description: Add a new candidate
+      operationId: post
+      requestBody:
+        description: Create a new candidate
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidateResponse'
+        '405':
+          description: Invalid input
+
+    get:
+      tags:
+        - Candidate
+      summary: Get All candidates
+      description: List all candidates
+      operationId: get
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CandidateResponse'
+
+    put:
+      tags:
+        - Candidate
+      summary: Update an existing candidate
+      description: Update an existing candidate by Id
+      operationId: update
+      requestBody:
+        description: Update an existent candidate
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CandidateResponse'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidateResponse'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Candidate not found
+        '405':
+          description: Validation exception
+
+  /candidate/{id}:
+    get:
+      tags:
+        - Candidate
+      summary: Find candidate by id
+      description: 'Return an candidate'
+      operationId: findCandidateById
+      parameters:
+        - name: id
+          in: path
+          description: Filter by ID
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CandidateResponse'
+        '400':
+          description: Invalid id value
+
+    delete:
+      tags:
+        - Candidate
+      summary: Delete a candidate
+      description: 'Delete'
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          description: Candidate id to delete
+          required: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        '400':
+          description: Invalid Id value
+
+  /room:
+    post:
+      tags:
+        - Room
+      summary: Add a new room
+      description: Add a new room
+      operationId: post
+      requestBody:
+        description: Create a new room
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Room'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomResponse'
+        '405':
+          description: Invalid input
+
+    get:
+      tags:
+        - Room
+      summary: Get All rooms
+      description: List all rooms
+      operationId: get
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoomResponse'
+
+    put:
+      tags:
+        - Room
+      summary: Update an existing room
+      description: Update an existing room by Id
+      operationId: update
+      requestBody:
+        description: Update an existent room
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomResponse'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomResponse'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Room not found
+        '405':
+          description: Validation exception
+
+  /room/{id}:
+    get:
+      tags:
+        - Room
+      summary: Find room by id
+      description: 'Return an room'
+      operationId: findRoomById
+      parameters:
+        - name: id
+          in: path
+          description: Filter by ID
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomResponse'
+        '400':
+          description: Invalid id value
+
+    delete:
+      tags:
+        - Room
+      summary: Delete a room
+      description: 'Delete'
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          description: Room id to delete
+          required: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        '400':
+          description: Invalid Id value
+
+  /availability:
+    post:
+      tags:
+        - Availability
+      summary: Add a new availability
+      description: Add a new availability
+      operationId: post
+      requestBody:
+        description: Create a new availability
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Availability'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailabilityResponse'
+        '405':
+          description: Invalid input
+
+    get:
+      tags:
+        - Availability
+      summary: Get All availabilitys
+      description: List all availabilitys
+      operationId: get
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AvailabilityResponse'
+
+
+    put:
+      tags:
+        - Availability
+      summary: Update an existing availability
+      description: Update an existing availability by Id
+      operationId: update
+      requestBody:
+        description: Update an existent availability
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AvailabilityResponse'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailabilityResponse'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Availability not found
+        '405':
+          description: Validation exception
+
+  /availability/{id}:
+    get:
+      tags:
+        - Availability
+      summary: Find availability by id
+      description: 'Return an availability'
+      operationId: findAvailabilityById
+      parameters:
+        - name: id
+          in: path
+          description: Filter by ID
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AvailabilityResponse'
+        '400':
+          description: Invalid id value
+
+    delete:
+      tags:
+        - Availability
+      summary: Delete an availability
+      description: 'Delete'
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          description: Availability id to delete
+          required: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        '400':
+          description: Invalid Id value
